@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prompt Forge — Character & Tag Builder</title>
+  <title>Prompt Forge | Character & Tag Builder</title>
   <meta name="description" content="Build character prompts for local LLMs and convert descriptions into image model tags. Free, client-side, and copy-ready">
   <meta property="og:title" content="Prompt Forge — Character & Tag Builder">
   <meta property="og:description" content="Build character prompts for local LLMs and convert descriptions into image model tags">
@@ -55,6 +55,12 @@
     <nav>
       <button class="nav-link active" data-mode="character" id="navCharacter">Character</button>
       <button class="nav-link" data-mode="tags" id="navTags">Tags</button>
+      <button class="nav-link nav-link--icon" id="toggleFooter" title="Toggle footer" aria-label="Toggle Neorgon footer" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
       <a class="header-home" href="https://neorgon.com/" title="neorgon.com" aria-label="Neorgon home">
         <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
@@ -79,6 +85,10 @@
           <div class="field-row">
             <label for="charPreset">Base preset</label>
             <select id="charPreset" class="input"></select>
+          </div>
+
+          <div class="field-row">
+            <button type="button" class="btn btn--secondary" id="randomizeCharBtn">🎲 Randomize partner</button>
           </div>
 
           <div class="grid-two">
@@ -117,6 +127,124 @@
             <textarea id="charExamples" class="input" rows="4" placeholder="User: hello&#10;Character: hey, what is it?"></textarea>
           </div>
 
+          <div class="field-row">
+            <label for="charFirstMessage">First message / greeting</label>
+            <textarea id="charFirstMessage" class="input" rows="2" placeholder="The opening line the character says when the chat starts"></textarea>
+          </div>
+
+          <div class="grid-two">
+            <div class="field-row">
+              <label for="charAttachment">Attachment style</label>
+              <select id="charAttachment" class="input">
+                <option value="secure">Secure</option>
+                <option value="anxious">Anxious</option>
+                <option value="avoidant">Avoidant</option>
+                <option value="disorganized">Disorganized</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label for="charLoveLanguage">Love language</label>
+              <select id="charLoveLanguage" class="input">
+                <option value="wordsOfAffirmation">Words of affirmation</option>
+                <option value="actsOfService">Acts of service</option>
+                <option value="receivingGifts">Receiving gifts</option>
+                <option value="qualityTime">Quality time</option>
+                <option value="physicalTouch">Physical touch</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-two">
+            <div class="field-row">
+              <label for="charRelationshipStage">Relationship stage</label>
+              <select id="charRelationshipStage" class="input">
+                <option value="strangers">Strangers</option>
+                <option value="crush">Crush</option>
+                <option value="dating">Dating</option>
+                <option value="longTerm">Long-term</option>
+                <option value="complicated">Complicated</option>
+                <option value="exes">Exes</option>
+                <option value="married">Married</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label for="charRelationshipDynamic">Dynamic</label>
+              <select id="charRelationshipDynamic" class="input">
+                <option value="childhoodFriends">Childhood friends</option>
+                <option value="bestFriends">Best friends</option>
+                <option value="rivalsToLovers">Rivals to lovers</option>
+                <option value="coworkers">Coworkers</option>
+                <option value="arranged">Arranged pairing</option>
+                <option value="slowBurn">Slow burn</option>
+                <option value="protective">Protective</option>
+                <option value="reconnecting">Reconnecting</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-two">
+            <div class="field-row">
+              <label for="charNsfwComfort">Intimacy level</label>
+              <select id="charNsfwComfort" class="input">
+                <option value="none">Romantic but non-explicit</option>
+                <option value="implied">Implied / fade-to-black</option>
+                <option value="explicit">Explicit with in-character consent</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label for="charConflictStyle">Conflict style</label>
+              <select id="charConflictStyle" class="input">
+                <option value="avoidant">Avoidant</option>
+                <option value="confrontational">Confrontational</option>
+                <option value="compromising">Compromising</option>
+                <option value="sulky">Sulky</option>
+                <option value="directGentle">Direct but gentle</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-two">
+            <div class="field-row">
+              <label for="charMood">Current mood</label>
+              <select id="charMood" class="input">
+                <option value="distant">Distant</option>
+                <option value="tired">Tired</option>
+                <option value="neutral" selected>Neutral</option>
+                <option value="playful">Playful</option>
+                <option value="needy">Needy</option>
+                <option value="jealous">Jealous</option>
+                <option value="affectionate">Affectionate</option>
+              </select>
+            </div>
+            <div class="field-row">
+              <label for="charPetNames">Pet names for user</label>
+              <input type="text" id="charPetNames" class="input" placeholder="e.g. babe, love, your name">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <label for="charBoundaries">Boundaries / red lines</label>
+            <textarea id="charBoundaries" class="input" rows="3" placeholder="What this character is not comfortable with. Pace, topics, escalation limits..."></textarea>
+          </div>
+
+          <div class="field-row">
+            <label for="charInsideJokes">Shared history / inside jokes</label>
+            <textarea id="charInsideJokes" class="input" rows="3" placeholder="Past moments, recurring jokes, shared references that make the relationship feel real"></textarea>
+          </div>
+
+          <div class="field-row">
+            <label for="charRhythm">Scene rhythm</label>
+            <select id="charRhythm" class="input">
+              <option value="none">No rhythm (freeform)</option>
+              <option value="slowBurn">Slow burn</option>
+              <option value="fightAndMakeUp">Fight → make up</option>
+              <option value="comfortAfterHardDay">Comfort after a hard day</option>
+              <option value="playfulTease">Playful tease</option>
+              <option value="deepeningIntimacy">Deepening intimacy</option>
+              <option value="reconnecting">Reconnecting after distance</option>
+            </select>
+          </div>
+
           <div class="sliders-grid">
             <div class="slider-row">
               <label for="narration">Narration</label>
@@ -138,6 +266,11 @@
               <input type="range" id="emotion" min="0" max="3" value="1">
               <span class="slider-label" id="emotionLabel">Balanced</span>
             </div>
+            <div class="slider-row">
+              <label for="compliance">Compliance</label>
+              <input type="range" id="compliance" min="0" max="3" value="1">
+              <span class="slider-label" id="complianceLabel">Balanced</span>
+            </div>
           </div>
 
           <div class="toggles-row">
@@ -145,6 +278,11 @@
             <label class="check"><input type="checkbox" id="avoidLoops" checked> Prevent question loops</label>
             <label class="check"><input type="checkbox" id="stayInCharacter" checked> Stay in character</label>
             <label class="check"><input type="checkbox" id="overNarrate"> Over-narrate details</label>
+          </div>
+
+          <div class="field-row">
+            <label for="charSystemPrefix">System prefix / override</label>
+            <textarea id="charSystemPrefix" class="input" rows="3" placeholder="Optional directive placed at the very start of the system prompt. Use only if your model requires a specific override format."></textarea>
           </div>
 
           <div class="field-row">
@@ -163,10 +301,26 @@
                 <option value="sillytavern">SillyTavern JSON</option>
               </select>
               <button type="button" class="btn btn--secondary btn--sm" id="copyCharBtn">Copy</button>
+              <button type="button" class="btn btn--secondary btn--sm" id="shareCharBtn">Share</button>
+              <button type="button" class="btn btn--secondary btn--sm" id="testFlightBtn">Test flight</button>
               <button type="button" class="btn btn--primary btn--sm" id="downloadCharBtn">Download</button>
             </div>
           </div>
-          <textarea id="charOutput" class="output-text" rows="14" readonly aria-label="Generated character prompt"></textarea>
+          <textarea id="charOutput" class="output-text" rows="14" readonly aria-label="Generated character prompt" placeholder="Fill the form above to generate a character prompt. The text will update as you type."></textarea>
+
+          <div class="cliche-panel" id="clichePanel" hidden>
+            <h4>Cliché check</h4>
+            <ul id="clicheList" class="cliche-list"></ul>
+          </div>
+
+          <div class="sim-panel" id="simPanel" hidden>
+            <h4>Test flight</h4>
+            <div class="sim-conversation" id="simConversation"></div>
+            <div class="sim-input-row">
+              <input type="text" id="simUserInput" class="input input--sm" placeholder="Type a test message, or leave blank for a random opener">
+              <button type="button" class="btn btn--secondary btn--sm" id="simSendBtn">Send</button>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -189,7 +343,7 @@
             <label class="check"><input type="checkbox" id="tagNormalize" checked> Normalize verbs</label>
             <label class="check"><input type="checkbox" id="tagDedupe" checked> Remove duplicates</label>
             <label class="check"><input type="checkbox" id="tagQuality" checked> Add quality tags</label>
-            <label class="check"><input type="checkbox" id="tagUncensored"> Uncensored mode</label>
+            <label class="check"><input type="checkbox" id="tagUncensored"> Skip default negative tags</label>
           </div>
 
           <div class="field-row">
@@ -211,7 +365,7 @@
               <button type="button" class="btn btn--primary btn--sm" id="downloadTagsBtn">Download</button>
             </div>
           </div>
-          <textarea id="tagsOutput" class="output-text" rows="6" readonly aria-label="Generated tags"></textarea>
+          <textarea id="tagsOutput" class="output-text" rows="6" readonly aria-label="Generated tags" placeholder="Type a description above to generate comma-separated tags."></textarea>
         </div>
 
         <div class="card">
@@ -221,7 +375,7 @@
               <button type="button" class="btn btn--secondary btn--sm" id="copyNegBtn">Copy</button>
             </div>
           </div>
-          <textarea id="negOutput" class="output-text" rows="4" readonly aria-label="Generated negative prompt"></textarea>
+          <textarea id="negOutput" class="output-text" rows="4" readonly aria-label="Generated negative prompt" placeholder="Add negative tags above, or enable 'Skip default negative tags' to see only your own."></textarea>
         </div>
       </section>
 

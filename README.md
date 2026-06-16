@@ -38,10 +38,11 @@ Prompt Forge builds context-rich character prompts for local LLMs and converts p
 
 ## Features
 
-- **Character builder** -- Pick a preset, tune behavior sliders, and export a system prompt that avoids cliches and question loops
+- **Character builder** -- 16 presets spanning companions, assistants, anime archetypes, RPG party members, and fiction archetypes; tune behavior and compliance sliders; export a system prompt that avoids cliches and question loops
 - **Tag formatter** -- Turn natural language like "sitting on a bed" into model-ready tags such as "sit, alone, bed"
 - **Multiple exports** -- Copy or download Markdown, LM Studio JSON, or SillyTavern JSON
-- **Uncensored mode** -- Tag formatter works with any prompt without forced filtering
+- **System prefix** -- Optional override directive placed at the start of the generated prompt
+- **Skip default negative tags** -- Tag formatter works with any prompt without forced filtering
 - **Local-only** -- No API calls, no tracking, no server-side processing
 
 ---

@@ -1,5 +1,9 @@
 import { state, saveState } from './state.js';
-import { renderMode, renderCharacterOutput, renderTagOutput, applyPreset } from './render.js';
+import { sliderLabel } from './prompts.js';
+import { renderMode, renderCharacterFields, renderCharacterOutput, renderTagOutput, applyPreset, updateTagQualityVisibility, renderFooterVisibility } from './render.js';
+import { copyShareLink } from './share.js';
+import { randomizeCharacter } from './random.js';
+import { renderSimulation } from './simulator.js';
 
 function bindInput(id, path, callback) {
   const el = document.getElementById(id);
@@ -26,6 +30,25 @@ function setPath(obj, path, value) {
   }
 }
 
+function hasCharacterEdits() {
+  const c = state.character;
+  return ['name', 'role', 'appearance', 'personality', 'background', 'speech', 'examples', 'firstMessage', 'boundaries', 'petNames', 'insideJokes', 'extra']
+    .some(key => String(c[key] || '').trim() !== '');
+}
+
+function announce(message) {
+  let region = document.getElementById('aria-live');
+  if (!region) {
+    region = document.createElement('div');
+    region.id = 'aria-live';
+    region.setAttribute('aria-live', 'polite');
+    region.setAttribute('aria-atomic', 'true');
+    region.className = 'visually-hidden';
+    document.body.appendChild(region);
+  }
+  region.textContent = message;
+}
+
 async function copyTextarea(id, buttonId, doneText = 'Copied') {
   const textarea = document.getElementById(id);
   const button = buttonId ? document.getElementById(buttonId) : null;
@@ -34,11 +57,15 @@ async function copyTextarea(id, buttonId, doneText = 'Copied') {
     if (button) {
       const original = button.textContent;
       button.textContent = doneText;
+      announce(doneText);
       setTimeout(() => button.textContent = original, 1200);
     }
   } catch (e) {
     textarea.select();
-    if (button) button.textContent = 'Select & copy';
+    if (button) {
+      button.textContent = 'Select & copy';
+      announce('Copy failed. Text is selected.');
+    }
   }
 }
 
@@ -53,25 +80,65 @@ function downloadTextarea(id, filename) {
   URL.revokeObjectURL(url);
 }
 
+function setMode(mode) {
+  state.mode = mode;
+  saveState();
+  renderMode();
+  updateUrlHash(mode);
+}
+
+function updateUrlHash(mode) {
+  try {
+    history.replaceState(null, '', mode === 'tags' ? '#tags' : '#character');
+  } catch (e) {
+    // ignore
+  }
+}
+
 export function bindEvents() {
   // Mode nav
-  document.getElementById('navCharacter').addEventListener('click', () => {
-    state.mode = 'character';
-    saveState();
-    renderMode();
-  });
-  document.getElementById('navTags').addEventListener('click', () => {
-    state.mode = 'tags';
-    saveState();
-    renderMode();
-  });
+  document.getElementById('navCharacter').addEventListener('click', () => setMode('character'));
+  document.getElementById('navTags').addEventListener('click', () => setMode('tags'));
+
+  // Footer visibility toggle
+  const footerToggle = document.getElementById('toggleFooter');
+  if (footerToggle) {
+    footerToggle.addEventListener('click', () => {
+      state.ui.hideFooter = !state.ui.hideFooter;
+      saveState();
+      renderFooterVisibility();
+    });
+  }
 
   // Preset selector
   const presetSelect = document.getElementById('charPreset');
   if (presetSelect) {
     presetSelect.addEventListener('change', () => {
-      applyPreset(presetSelect.value);
+      const presetId = presetSelect.value;
+      if (presetId !== 'blank' && hasCharacterEdits()) {
+        const confirmed = confirm('Loading a preset will replace your current character fields. Continue?');
+        if (!confirmed) {
+          presetSelect.value = state.character.preset;
+          return;
+        }
+      }
+      applyPreset(presetId);
       saveState();
+    });
+  }
+
+  // Randomize partner
+  const randomizeBtn = document.getElementById('randomizeCharBtn');
+  if (randomizeBtn) {
+    randomizeBtn.addEventListener('click', () => {
+      if (hasCharacterEdits()) {
+        const confirmed = confirm('Randomize will replace your current character. Continue?');
+        if (!confirmed) return;
+      }
+      Object.assign(state.character, randomizeCharacter());
+      saveState();
+      renderCharacterFields();
+      renderCharacterOutput();
     });
   }
 
@@ -84,11 +151,23 @@ export function bindEvents() {
     { id: 'charBackground', path: 'character.background' },
     { id: 'charSpeech', path: 'character.speech' },
     { id: 'charExamples', path: 'character.examples' },
+    { id: 'charFirstMessage', path: 'character.firstMessage' },
+    { id: 'charSystemPrefix', path: 'character.systemPrefix' },
+    { id: 'charAttachment', path: 'character.attachment' },
+    { id: 'charLoveLanguage', path: 'character.loveLanguage' },
+    { id: 'charRelationshipStage', path: 'character.relationshipStage' },
+    { id: 'charRelationshipDynamic', path: 'character.relationshipDynamic' },
+    { id: 'charNsfwComfort', path: 'character.nsfwComfort' },
+    { id: 'charBoundaries', path: 'character.boundaries' },
+    { id: 'charPetNames', path: 'character.petNames' },
+    { id: 'charInsideJokes', path: 'character.insideJokes' },
+    { id: 'charRhythm', path: 'character.rhythm' },
     { id: 'charExtra', path: 'character.extra' },
     { id: 'narration', path: 'character.narration' },
     { id: 'bluntness', path: 'character.bluntness' },
     { id: 'initiative', path: 'character.initiative' },
     { id: 'emotion', path: 'character.emotion' },
+    { id: 'compliance', path: 'character.compliance' },
     { id: 'avoidCliches', path: 'character.avoidCliches' },
     { id: 'avoidLoops', path: 'character.avoidLoops' },
     { id: 'stayInCharacter', path: 'character.stayInCharacter' },
@@ -99,15 +178,15 @@ export function bindEvents() {
     if (f.path.startsWith('character.narration') ||
         f.path.startsWith('character.bluntness') ||
         f.path.startsWith('character.initiative') ||
-        f.path.startsWith('character.emotion')) {
-      // label will update on next render; re-render all fields for labels
+        f.path.startsWith('character.emotion') ||
+        f.path.startsWith('character.compliance')) {
       renderCharacterOutput();
-      // re-render fields to update slider labels without losing focus hack
       const c = state.character;
-      document.getElementById('narrationLabel').textContent = getSliderLabel('narration', c.narration);
-      document.getElementById('bluntnessLabel').textContent = getSliderLabel('bluntness', c.bluntness);
-      document.getElementById('initiativeLabel').textContent = getSliderLabel('initiative', c.initiative);
-      document.getElementById('emotionLabel').textContent = getSliderLabel('emotion', c.emotion);
+      document.getElementById('narrationLabel').textContent = sliderLabel('narration', c.narration);
+      document.getElementById('bluntnessLabel').textContent = sliderLabel('bluntness', c.bluntness);
+      document.getElementById('initiativeLabel').textContent = sliderLabel('initiative', c.initiative);
+      document.getElementById('emotionLabel').textContent = sliderLabel('emotion', c.emotion);
+      document.getElementById('complianceLabel').textContent = sliderLabel('compliance', c.compliance);
     } else {
       renderCharacterOutput();
     }
@@ -123,10 +202,44 @@ export function bindEvents() {
     { id: 'tagQualityList', path: 'tags.qualityList' },
     { id: 'tagNegative', path: 'tags.negative' }
   ];
-  tagFields.forEach(f => bindInput(f.id, f.path, renderTagOutput));
+  tagFields.forEach(f => bindInput(f.id, f.path, () => {
+    if (f.path === 'tags.quality') {
+      updateTagQualityVisibility();
+    }
+    renderTagOutput();
+  }));
 
-  // Copy / download actions
+  // Copy / download / share / test actions
   document.getElementById('copyCharBtn').addEventListener('click', () => copyTextarea('charOutput', 'copyCharBtn'));
+  document.getElementById('shareCharBtn').addEventListener('click', () => copyShareLink(document.getElementById('shareCharBtn')));
+
+  const simPanel = document.getElementById('simPanel');
+  const simConversation = document.getElementById('simConversation');
+  const simUserInput = document.getElementById('simUserInput');
+  const simSendBtn = document.getElementById('simSendBtn');
+
+  document.getElementById('testFlightBtn').addEventListener('click', () => {
+    simPanel.hidden = false;
+    renderSimulation(simConversation, state.character, simUserInput.value.trim());
+    simUserInput.value = '';
+  });
+
+  if (simSendBtn) {
+    simSendBtn.addEventListener('click', () => {
+      renderSimulation(simConversation, state.character, simUserInput.value.trim());
+      simUserInput.value = '';
+    });
+  }
+
+  if (simUserInput) {
+    simUserInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        renderSimulation(simConversation, state.character, simUserInput.value.trim());
+        simUserInput.value = '';
+      }
+    });
+  }
+
   document.getElementById('downloadCharBtn').addEventListener('click', () => {
     const ext = state.character.format === 'markdown' ? 'md' : 'json';
     const name = state.character.name || 'character';
@@ -135,14 +248,4 @@ export function bindEvents() {
   document.getElementById('copyTagsBtn').addEventListener('click', () => copyTextarea('tagsOutput', 'copyTagsBtn'));
   document.getElementById('downloadTagsBtn').addEventListener('click', () => downloadTextarea('tagsOutput', 'tags.txt'));
   document.getElementById('copyNegBtn').addEventListener('click', () => copyTextarea('negOutput', 'copyNegBtn'));
-}
-
-function getSliderLabel(key, value) {
-  const map = {
-    narration: ['Concise', 'Balanced', 'Detailed', 'Over-narrated'],
-    bluntness: ['Soft', 'Balanced', 'Direct', 'Blunt'],
-    initiative: ['Passive', 'Reactive', 'Proactive', 'Leading'],
-    emotion: ['Muted', 'Balanced', 'Expressive', 'Intense']
-  };
-  return (map[key] || [])[value] || 'Balanced';
 }

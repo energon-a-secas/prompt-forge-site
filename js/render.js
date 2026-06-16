@@ -2,13 +2,17 @@ import { state } from './state.js';
 import { listPresets, getPreset } from './presets.js';
 import { sliderLabel, buildCharacterOutput } from './prompts.js';
 import { formatTags, formatNegative } from './tags.js';
+import { detectCliches, severityClass } from './cliche-detector.js';
 
 export function render() {
   renderMode();
   renderPresets();
   renderCharacterFields();
   renderCharacterOutput();
+  renderTagFields();
   renderTagOutput();
+  updateTagQualityVisibility();
+  renderFooterVisibility();
 }
 
 export function renderMode() {
@@ -54,17 +58,32 @@ export function renderCharacterFields() {
   setValue('charBackground', c.background);
   setValue('charSpeech', c.speech);
   setValue('charExamples', c.examples);
+  setValue('charFirstMessage', c.firstMessage);
+  setValue('charSystemPrefix', c.systemPrefix);
+
+  setValue('charAttachment', c.attachment);
+  setValue('charLoveLanguage', c.loveLanguage);
+  setValue('charRelationshipStage', c.relationshipStage);
+  setValue('charRelationshipDynamic', c.relationshipDynamic);
+  setValue('charNsfwComfort', c.nsfwComfort);
+  setValue('charBoundaries', c.boundaries);
+  setValue('charPetNames', c.petNames);
+  setValue('charInsideJokes', c.insideJokes);
+  setValue('charRhythm', c.rhythm);
+
   setValue('charExtra', c.extra);
 
   setValue('narration', c.narration);
   setValue('bluntness', c.bluntness);
   setValue('initiative', c.initiative);
   setValue('emotion', c.emotion);
+  setValue('compliance', c.compliance);
 
   setLabel('narrationLabel', sliderLabel('narration', c.narration));
   setLabel('bluntnessLabel', sliderLabel('bluntness', c.bluntness));
   setLabel('initiativeLabel', sliderLabel('initiative', c.initiative));
   setLabel('emotionLabel', sliderLabel('emotion', c.emotion));
+  setLabel('complianceLabel', sliderLabel('compliance', c.compliance));
 
   setChecked('avoidCliches', c.avoidCliches);
   setChecked('avoidLoops', c.avoidLoops);
@@ -78,6 +97,25 @@ export function renderCharacterOutput() {
   const output = document.getElementById('charOutput');
   if (!output) return;
   output.value = buildCharacterOutput(state.character);
+  renderClicheWarnings(output.value);
+}
+
+export function renderClicheWarnings(text) {
+  const panel = document.getElementById('clichePanel');
+  const list = document.getElementById('clicheList');
+  if (!panel || !list) return;
+
+  const warnings = detectCliches(text);
+  if (warnings.length === 0) {
+    panel.hidden = true;
+    list.innerHTML = '';
+    return;
+  }
+
+  panel.hidden = false;
+  list.innerHTML = warnings.map(w =>
+    `<li class="${severityClass(w.severity)}" data-severity="${w.severity}">${w.message}</li>`
+  ).join('');
 }
 
 export function renderTagFields() {
@@ -122,9 +160,37 @@ function setLabel(id, text) {
   if (el) el.textContent = text;
 }
 
+const RELATIONSHIP_DEFAULTS = {
+  attachment: 'secure',
+  loveLanguage: 'qualityTime',
+  relationshipStage: 'dating',
+  relationshipDynamic: 'childhoodFriends',
+  boundaries: '',
+  petNames: '',
+  insideJokes: '',
+  nsfwComfort: 'none',
+  rhythm: 'none'
+};
+
 export function applyPreset(id) {
   const preset = getPreset(id);
-  state.character = { ...state.character, ...preset, preset: id };
+  state.character = { ...state.character, ...RELATIONSHIP_DEFAULTS, ...preset, preset: id };
   renderCharacterFields();
   renderCharacterOutput();
+}
+
+export function updateTagQualityVisibility() {
+  const qualityToggle = document.getElementById('tagQuality');
+  const qualityField = document.getElementById('tagQualityList')?.closest('.field-row');
+  if (!qualityToggle || !qualityField) return;
+  qualityField.hidden = !qualityToggle.checked;
+}
+
+export function renderFooterVisibility() {
+  const btn = document.getElementById('toggleFooter');
+  if (!btn) return;
+  const hidden = state.ui?.hideFooter ?? false;
+  document.body.classList.toggle('footer-hidden', hidden);
+  btn.setAttribute('aria-pressed', String(hidden));
+  btn.title = hidden ? 'Show footer' : 'Hide footer';
 }
