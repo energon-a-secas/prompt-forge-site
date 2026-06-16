@@ -1,0 +1,36 @@
+---
+config:
+  theme: base
+  themeVariables:
+    primaryColor: "#0f172a"
+    primaryTextColor: "#e2e8f0"
+    primaryBorderColor: "#0063e5"
+    lineColor: "#38bdf8"
+    secondaryColor: "#1e293b"
+    tertiaryColor: "#1e293b"
+    clusterBkg: "#f0f7ff"
+    clusterBorder: "#bfdbfe"
+    edgeLabelBackground: "#e8f0ff"
+    mainBkg: "#0f172a"
+    nodeBorder: "#0063e5"
+    titleColor: "#1e1b4b"
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, sans-serif"
+    fontSize: "13px"
+---
+
+flowchart TB
+    User([User]) --> HTML["index.html\nApp shell"]
+
+    subgraph App["ES Modules"]
+        HTML --> app["app.js\nEntry point"]
+        app --> state["state.js\nShared state + localStorage"]
+        app --> render["render.js\nDOM rendering"]
+        app --> events["events.js\nUser interactions"]
+        app --> presets["presets.js\nCharacter base templates"]
+        app --> prompts["prompts.js\nCharacter prompt generation"]
+        app --> tags["tags.js\nTag formatter logic"]
+    end
+
+    state <-->|"prompt-forge-state"| Storage[("localStorage")]
+    prompts -->|"Markdown / JSON"| Clipboard[("Clipboard / Download")]
+    tags -->|"comma-separated tags"| Clipboard
