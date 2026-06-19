@@ -1,9 +1,11 @@
 import { state, saveState } from './state.js';
 import { sliderLabel } from './prompts.js';
-import { renderMode, renderCharacterFields, renderCharacterOutput, renderTagOutput, applyPreset, updateTagQualityVisibility, renderFooterVisibility } from './render.js';
+import { renderMode, renderCharacterFields, renderCharacterOutput, renderTagOutput, applyPreset, updateTagQualityVisibility, renderFooterVisibility, renderProfileList } from './render.js';
 import { copyShareLink } from './share.js';
 import { randomizeCharacter } from './random.js';
 import { renderSimulation } from './simulator.js';
+import { generateScenario } from './scenarios.js';
+import { NEGATIVE_PRESETS } from './tags.js';
 
 function bindInput(id, path, callback) {
   const el = document.getElementById(id);
@@ -142,6 +144,63 @@ export function bindEvents() {
     });
   }
 
+  // Generate scenario
+  const scenarioBtn = document.getElementById('generateScenarioBtn');
+  if (scenarioBtn) {
+    scenarioBtn.addEventListener('click', () => {
+      state.character.background = generateScenario(state.character);
+      saveState();
+      renderCharacterFields();
+      renderCharacterOutput();
+    });
+  }
+
+  // Saved profiles
+  const profileNameInput = document.getElementById('profileName');
+  const saveProfileBtn = document.getElementById('saveProfileBtn');
+  const loadProfileSelect = document.getElementById('loadProfile');
+  const loadProfileBtn = document.getElementById('loadProfileBtn');
+  const deleteProfileBtn = document.getElementById('deleteProfileBtn');
+
+  if (saveProfileBtn && profileNameInput) {
+    saveProfileBtn.addEventListener('click', () => {
+      const name = profileNameInput.value.trim();
+      if (!name) return;
+      state.profiles[name] = { ...state.character };
+      saveState();
+      renderProfileList();
+      setTimeout(() => { loadProfileSelect.value = name; }, 0);
+      profileNameInput.value = '';
+    });
+  }
+
+  if (loadProfileBtn && loadProfileSelect) {
+    loadProfileBtn.addEventListener('click', () => {
+      const name = loadProfileSelect.value;
+      if (!name || !state.profiles[name]) return;
+      if (hasCharacterEdits()) {
+        const confirmed = confirm(`Load profile "${name}"? This will replace your current character.`);
+        if (!confirmed) return;
+      }
+      Object.assign(state.character, state.profiles[name]);
+      saveState();
+      renderCharacterFields();
+      renderCharacterOutput();
+    });
+  }
+
+  if (deleteProfileBtn && loadProfileSelect) {
+    deleteProfileBtn.addEventListener('click', () => {
+      const name = loadProfileSelect.value;
+      if (!name || !state.profiles[name]) return;
+      const confirmed = confirm(`Delete profile "${name}"?`);
+      if (!confirmed) return;
+      delete state.profiles[name];
+      saveState();
+      renderProfileList();
+    });
+  }
+
   // Character fields
   const charFields = [
     { id: 'charName', path: 'character.name' },
@@ -158,6 +217,8 @@ export function bindEvents() {
     { id: 'charRelationshipStage', path: 'character.relationshipStage' },
     { id: 'charRelationshipDynamic', path: 'character.relationshipDynamic' },
     { id: 'charNsfwComfort', path: 'character.nsfwComfort' },
+    { id: 'charConflictStyle', path: 'character.conflictStyle' },
+    { id: 'charMood', path: 'character.mood' },
     { id: 'charBoundaries', path: 'character.boundaries' },
     { id: 'charPetNames', path: 'character.petNames' },
     { id: 'charInsideJokes', path: 'character.insideJokes' },
@@ -208,6 +269,19 @@ export function bindEvents() {
     }
     renderTagOutput();
   }));
+
+  const negPreset = document.getElementById('negPreset');
+  if (negPreset) {
+    negPreset.addEventListener('change', () => {
+      const preset = NEGATIVE_PRESETS[negPreset.value];
+      if (preset !== undefined) {
+        state.tags.negative = preset;
+        document.getElementById('tagNegative').value = preset;
+        saveState();
+        renderTagOutput();
+      }
+    });
+  }
 
   // Copy / download / share / test actions
   document.getElementById('copyCharBtn').addEventListener('click', () => copyTextarea('charOutput', 'copyCharBtn'));

@@ -87,6 +87,20 @@
             <select id="charPreset" class="input"></select>
           </div>
 
+          <div class="field-row profile-row">
+            <div class="profile-save">
+              <input type="text" id="profileName" class="input input--sm" placeholder="Profile name">
+              <button type="button" class="btn btn--secondary btn--sm" id="saveProfileBtn">Save</button>
+            </div>
+            <div class="profile-load">
+              <select id="loadProfile" class="input input--sm">
+                <option value="">Load saved profile...</option>
+              </select>
+              <button type="button" class="btn btn--secondary btn--sm" id="loadProfileBtn">Load</button>
+              <button type="button" class="btn btn--secondary btn--sm" id="deleteProfileBtn">Delete</button>
+            </div>
+          </div>
+
           <div class="field-row">
             <button type="button" class="btn btn--secondary" id="randomizeCharBtn">🎲 Randomize partner</button>
           </div>
@@ -113,7 +127,10 @@
           </div>
 
           <div class="field-row">
-            <label for="charBackground">Background / scenario</label>
+            <div class="label-row">
+              <label for="charBackground">Background / scenario</label>
+              <button type="button" class="btn btn--sm btn--secondary" id="generateScenarioBtn">Generate scenario</button>
+            </div>
             <textarea id="charBackground" class="input" rows="4" placeholder="Where are they? What is the current situation?"></textarea>
           </div>
 
@@ -352,7 +369,16 @@
           </div>
 
           <div class="field-row">
-            <label for="tagNegative">Negative prompt</label>
+            <div class="label-row">
+              <label for="tagNegative">Negative prompt</label>
+              <select id="negPreset" class="input input--sm" style="width: auto;">
+                <option value="standard">Preset: standard</option>
+                <option value="anime">Preset: anime</option>
+                <option value="photorealistic">Preset: photorealistic</option>
+                <option value="nsfwSafety">Preset: NSFW safety</option>
+                <option value="portrait">Preset: portrait</option>
+              </select>
+            </div>
             <textarea id="tagNegative" class="input" rows="4" placeholder="lowres, bad anatomy, blurry, watermark..."></textarea>
           </div>
         </div>

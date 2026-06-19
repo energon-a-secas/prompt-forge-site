@@ -7,6 +7,7 @@ import { detectCliches, severityClass } from './cliche-detector.js';
 export function render() {
   renderMode();
   renderPresets();
+  renderProfileList();
   renderCharacterFields();
   renderCharacterOutput();
   renderTagFields();
@@ -48,6 +49,22 @@ export function renderPresets() {
   select.dataset.rendered = 'true';
 }
 
+export function renderProfileList() {
+  const select = document.getElementById('loadProfile');
+  if (!select) return;
+  const current = select.value;
+  select.innerHTML = '<option value="">Load saved profile...</option>';
+  Object.keys(state.profiles || {}).sort().forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    option.textContent = name;
+    select.appendChild(option);
+  });
+  if (current && state.profiles[current]) {
+    select.value = current;
+  }
+}
+
 export function renderCharacterFields() {
   const c = state.character;
   setValue('charPreset', c.preset);
@@ -66,6 +83,8 @@ export function renderCharacterFields() {
   setValue('charRelationshipStage', c.relationshipStage);
   setValue('charRelationshipDynamic', c.relationshipDynamic);
   setValue('charNsfwComfort', c.nsfwComfort);
+  setValue('charConflictStyle', c.conflictStyle);
+  setValue('charMood', c.mood);
   setValue('charBoundaries', c.boundaries);
   setValue('charPetNames', c.petNames);
   setValue('charInsideJokes', c.insideJokes);
@@ -169,7 +188,9 @@ const RELATIONSHIP_DEFAULTS = {
   petNames: '',
   insideJokes: '',
   nsfwComfort: 'none',
-  rhythm: 'none'
+  rhythm: 'none',
+  conflictStyle: 'compromising',
+  mood: 'neutral'
 };
 
 export function applyPreset(id) {

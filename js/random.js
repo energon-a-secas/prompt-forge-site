@@ -103,6 +103,8 @@ export function randomizeCharacter() {
     insideJokes: '',
     nsfwComfort: 'none',
     rhythm: 'none',
+    conflictStyle: pick(['avoidant', 'confrontational', 'compromising', 'sulky', 'directGentle']),
+    mood: 'neutral',
     narration: randInt(1, 2),
     bluntness: randInt(0, 2),
     initiative: randInt(1, 2),

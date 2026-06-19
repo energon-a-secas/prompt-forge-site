@@ -21,6 +21,14 @@ const QUALITY_NEGATIVE = [
   'blurry', 'artist name', 'mutation', 'deformed', 'ugly', 'disfigured'
 ];
 
+export const NEGATIVE_PRESETS = {
+  standard: '',
+  anime: 'bad anatomy, bad hands, missing fingers, extra digits, fewer digits, blurry, lowres, bad proportions, disfigured, mutation, deformed, watermark, signature, text, logo',
+  photorealistic: 'painting, drawing, illustration, sketch, cartoon, anime, 3d render, doll, plastic, oversaturated, oversharpened, airbrushed, duplicate, morbid, mutated',
+  nsfwSafety: 'child, loli, shota, minor, underage, cp, bestiality, scat, gore, amputee, obese, text, watermark, signature, bad anatomy',
+  portrait: 'bad anatomy, extra limbs, extra fingers, malformed hands, missing arms, missing legs, extra face, double head, extra head, watermark, signature, text, logo, cropped'
+};
+
 function stripPunctuation(word) {
   return word.replace(/^[^\w]+|[^\w]+$/g, '').toLowerCase();
 }

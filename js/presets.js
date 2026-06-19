@@ -27,6 +27,8 @@ export const PRESETS = {
     insideJokes: '',
     nsfwComfort: 'none',
     rhythm: 'none',
+    conflictStyle: 'compromising',
+    mood: 'neutral',
     extra: ''
   },
   caring: {

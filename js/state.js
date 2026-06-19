@@ -50,6 +50,7 @@ function createDefaultState() {
     ui: {
       hideFooter: false
     },
+    profiles: {},
     version: STORAGE_VERSION
   };
 }
@@ -61,6 +62,17 @@ function validateUi(ui) {
     ...ui,
     hideFooter: Boolean(ui?.hideFooter ?? defaults.hideFooter)
   };
+}
+
+function validateProfiles(profiles) {
+  if (!profiles || typeof profiles !== 'object') return {};
+  const valid = {};
+  for (const [key, value] of Object.entries(profiles)) {
+    if (value && typeof value === 'object') {
+      valid[key] = value;
+    }
+  }
+  return valid;
 }
 
 function clampInt(value, min, max, fallback) {
@@ -148,6 +160,9 @@ export function loadSaved() {
     }
     if (saved.ui) {
       state.ui = validateUi(saved.ui);
+    }
+    if (saved.profiles) {
+      state.profiles = validateProfiles(saved.profiles);
     }
     state.version = STORAGE_VERSION;
   } catch (e) {
