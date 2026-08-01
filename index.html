@@ -23,6 +23,12 @@
   <meta name="twitter:image" content="https://promptforge.neorgon.com/og-preview.jpg">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="stylesheet" href="css/style.css">
+  <!-- Neorgon Header Kit (vendored; ?header=live swaps CSS to CDN) -->
+  <script>(function(){var m=location.search.match(/[?&]theme=([\w-]+)/)||document.cookie.match(/(?:^|;\s*)neo_theme=([\w-]+)/);if(m&&m[1]!=='default')document.documentElement.dataset.theme=decodeURIComponent(m[1]);})();</script>
+  <link rel="stylesheet" href="css/neorgon-header.css">
+  <link rel="stylesheet" href="css/neorgon-themes.css">
+  <link rel="stylesheet" href="https://pub-b597cd281a384f98a47e1f043a6c4160.r2.dev/v1.0.0/header/season.css">
+  <script defer src="js/neorgon-header.js"></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -41,7 +47,7 @@
 
   <a class="skip-link" href="#main">Skip to content</a>
 
-  <header class="header-bar">
+  <header class="header-bar" data-header-mode="app">
     <div class="header-logo">
       <a href="https://neorgon.com/" target="_blank" rel="noopener noreferrer">
         <img src="energon-classic-logo.png" class="header-logo-img" alt="Logo">
@@ -52,21 +58,24 @@
       </a>
     </div>
 
-    <nav>
-      <button class="nav-link active" data-mode="character" id="navCharacter">Character</button>
-      <button class="nav-link" data-mode="tags" id="navTags">Tags</button>
-      <button class="nav-link nav-link--icon" id="toggleFooter" title="Toggle footer" aria-label="Toggle Neorgon footer" aria-pressed="false">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
-          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-          <circle cx="12" cy="12" r="3"/>
-        </svg>
-      </button>
+    <div class="header-right">
+      <nav class="header-actions">
+        <button data-keep-mobile class="nav-link active" data-mode="character" id="navCharacter">Character</button>
+        <button data-keep-mobile class="nav-link" data-mode="tags" id="navTags">Tags</button>
+        <button class="nav-link nav-link--icon" id="toggleFooter" title="Toggle footer" aria-label="Toggle Neorgon footer" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+    
+      </nav>
       <a class="header-home" href="https://neorgon.com/" title="neorgon.com" aria-label="Neorgon home">
-        <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-        </svg>
+      <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
       </a>
-    </nav>
+    </div>
   </header>
 
   <main id="main">
