@@ -98,12 +98,9 @@
 
       <!-- Character Builder Mode -->
       <section class="section mode-panel" id="characterPanel" aria-labelledby="character-title">
-        <div class="section__header">
-          <div class="section__titles">
-            <h2 class="section__title" id="character-title">Character prompt builder</h2>
-            <p class="section__lead">Pick a base, tune behavior, and export a system prompt for LM Studio or a SillyTavern card.</p>
-          </div>
-        </div>
+        <!-- Named for assistive tech only: the header's subtitle and the
+             pressed Character button already say where you are. -->
+        <h2 class="visually-hidden" id="character-title">Character prompt builder</h2>
 
         <div class="card card--flat">
           <div class="field-row">
@@ -367,12 +364,7 @@
 
       <!-- Tag Formatter Mode -->
       <section class="section mode-panel" id="tagsPanel" aria-labelledby="tags-title" hidden>
-        <div class="section__header">
-          <div class="section__titles">
-            <h2 class="section__title" id="tags-title">Tag formatter</h2>
-            <p class="section__lead">Turn a plain description into comma-separated tags for image models. Free, local, no API calls.</p>
-          </div>
-        </div>
+        <h2 class="visually-hidden" id="tags-title">Tag formatter</h2>
 
         <div class="card card--flat">
           <div class="field-row">
@@ -433,6 +425,7 @@
   </main>
 
   <footer class="neo-footer" data-footer-mode="minimal">
+    Runs in your browser: no account, no API calls.
   </footer>
 
   <script type="module" src="js/app.js"></script>

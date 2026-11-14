@@ -33,6 +33,9 @@ export function renderMode() {
     navCharacter.classList.add('active');
     navTags.classList.remove('active');
   }
+  // The pressed button is the panel's only visible name, so say it to assistive tech too.
+  navCharacter.setAttribute('aria-pressed', String(state.mode !== 'tags'));
+  navTags.setAttribute('aria-pressed', String(state.mode === 'tags'));
 }
 
 export function renderPresets() {
